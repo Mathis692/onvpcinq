@@ -63,8 +63,6 @@ function generateLayoutThumbnails() {
   if (first) first.classList.add('selected');
 }
 
-
-
 // Génération des inputs texte et image selon layout sélectionné
 function updateInputs() {
   textInputsDiv.innerHTML = '';
@@ -74,11 +72,11 @@ function updateInputs() {
   images = Array(layout.blocks.length).fill(null);
 
   layout.blocks.forEach((block, i) => {
-    // Création d’un container input-group (avec filet orange en bas)
+    // Création d’un container input-group
     const inputGroup = document.createElement('div');
     inputGroup.classList.add('input-group');
 
-    // Wrapper orange pour le champ texte
+    // Wrapper pour le champ texte
     const textWrapper = document.createElement('div');
     textWrapper.classList.add('text-wrapper');
 
@@ -92,7 +90,7 @@ function updateInputs() {
     textWrapper.appendChild(tInput);
     inputGroup.appendChild(textWrapper);
 
-    // Sélecteur de perspective sous le texte
+    // Sélecteur de perspective
     const selectPersp = document.createElement('select');
     [
       { value: 'none', label: 'Regular' },
@@ -116,7 +114,6 @@ function updateInputs() {
     });
 
     inputGroup.appendChild(selectPersp);
-
     textInputsDiv.appendChild(inputGroup);
 
     // Input image si autorisé dans le layout
@@ -135,13 +132,12 @@ function updateInputs() {
           };
           img.src = ev.target.result;
         };
-        reader.readAsDataURL(file);
+        if (file) reader.readAsDataURL(file);
       });
       imageInputsDiv.appendChild(imgInput);
     }
   });
 
-  
   drawLayout(layout, texts, images);
 }
 
@@ -186,3 +182,60 @@ function enableDragScroll(container) {
 generateLayoutThumbnails();
 enableDragScroll(layoutThumbnails);
 updateInputs();
+
+/* ---------- Mobile: réduction/extension des paramètres ---------- */
+// ATTENTION: nécessite dans index.html un bouton:
+// <div id="settingsHeader" class="floating-header">PARAMÈTRES
+//   <button id="toggleSettings" style="display:none;">–</button>
+// </div>
+
+const toggleBtn = document.getElementById('toggleSettings');
+const settingsWindow = document.getElementById('settingsModal');
+const canvasContainer = document.getElementById('canvasContainer');
+
+let settingsCollapsed = false;
+
+// applique les hauteurs en mode mobile (interface en bas, canvas en haut)
+function applyMobileHeights(collapsed) {
+  if (!settingsWindow || !canvasContainer) return;
+  if (collapsed) {
+    // interface réduite à une barre
+    settingsWindow.style.height = '40px';
+    canvasContainer.style.height = 'calc(100vh - 40px)';
+  } else {
+    // 40% / 60%
+    settingsWindow.style.height = '40vh';
+    canvasContainer.style.height = '60vh';
+  }
+}
+
+// montre/cache le bouton et réinitialise les styles hors mobile
+function checkMobileMode() {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  if (!toggleBtn) return; // sécurité si le bouton n'existe pas
+
+  if (isMobile) {
+    toggleBtn.style.display = 'inline-block';
+    applyMobileHeights(settingsCollapsed);
+  } else {
+    toggleBtn.style.display = 'none';
+    // on enlève les styles inline pour laisser le CSS desktop gérer
+    if (settingsWindow) settingsWindow.style.height = '';
+    if (canvasContainer) canvasContainer.style.height = '';
+    settingsCollapsed = false;
+    toggleBtn.textContent = '–';
+  }
+}
+
+// écouteur sur le bouton (uniquement si présent)
+if (toggleBtn && settingsWindow && canvasContainer) {
+  toggleBtn.addEventListener('click', () => {
+    settingsCollapsed = !settingsCollapsed;
+    applyMobileHeights(settingsCollapsed);
+    toggleBtn.textContent = settingsCollapsed ? '+' : '–';
+  });
+
+  window.addEventListener('resize', checkMobileMode);
+  checkMobileMode();
+}
