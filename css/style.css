@@ -29,9 +29,10 @@ body {
   width: 320px;
   max-height: 90vh;
   background: rgba(30,30,30,0.85);
+   backdrop-filter: blur(10px);
   border-radius: 0;
   box-shadow: 0 8px 24px rgba(0,0,0,0.7);
-  backdrop-filter: blur(10px);
+ 
   -webkit-backdrop-filter: blur(10px);
   color: #ffffff;
   display: flex;
@@ -274,8 +275,8 @@ button:hover {
 canvas {
   border: none !important;
   background: white;
-  height: 80%;
-  max-width: 100%;
+  max-height: 80%;
+  max-width: 80%;
   display: block;
   margin: auto;
 }
@@ -441,4 +442,144 @@ select#formatSelect option {
   background: url('/img/background.jpeg') no-repeat center center;
   background-size: cover;
   position: relative;
+}
+
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column;
+  }
+
+  .floating-window {
+    position: relative;
+    width: 100%;
+    height: 40vh; /* 40% de la hauteur visible */
+    max-height: none;
+    top: 0;
+    left: 0;
+    border-bottom: 2px solid #fff;
+  }
+
+  #canvasContainer {
+    height: 60vh; /* 60% de la hauteur visible */
+    flex: none;
+  }
+}
+
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column-reverse; /* interface en bas */
+    height: 100vh;
+  }
+
+  .floating-window {
+    position: relative;
+    width: 100%;
+    height: 40vh; /* 40% hauteur par défaut */
+    max-height: none;
+    top: auto;
+    left: auto;
+    border-top: 2px solid #fff;
+    border-bottom: none;
+    transition: height 0.3s ease;
+  }
+
+  #canvasContainer {
+    height: 60vh; /* 60% hauteur par défaut */
+    flex: none;
+    transition: height 0.3s ease;
+  }
+
+  /* Bouton affiché seulement sur mobile */
+  #toggleSettings {
+    display: inline-block;
+    margin-left: 10px;
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+}
+
+/* --- FOND PLEIN ÉCRAN FIXE --- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url('/img/background.jpeg') center/cover no-repeat;
+  /* pas de parallaxe -> ne bouge jamais */
+  will-change: transform;
+}
+
+/* le container du canvas n'a plus de fond propre */
+#canvasContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent; /* remplace l'ancienne image */
+  position: relative;
+}
+
+/* --- BOUTON DISCRET (MOBILE SEULEMENT) --- */
+#toggleSettings {
+  display: none;           /* desktop: caché */
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  font-size: 16px;
+  color: #fff;
+  border-radius: 6px;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 768px) {
+  #app { 
+    flex-direction: column-reverse; /* interface en bas */
+    height: 100vh;
+  }
+
+  /* typos plus petites */
+  .floating-header { font-size: 18px; padding: 10px 0; }
+  .label-col { font-size: 12px; }
+  .text-wrapper input[type="text"] { font-size: 13px; }
+  .input-group select { font-size: 13px; }
+  button { padding: 10px; font-size: 14px; }
+  #exportBtn { font-size: 18px; }
+
+  /* tailles par défaut interface/canvas */
+  .floating-window {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    max-height: none;
+    top: auto; left: auto;
+    border-top: 0px solid #ffffff;
+    border-bottom: none;
+    transition: height .25s ease;
+    background: rgba(30,30,30,0.05);
+   backdrop-filter: blur(10px);
+   padding: 5px;
+  }
+  #canvasContainer {
+    height: 60vh;
+    flex: none;
+    transition: height .25s ease;
+  }
+
+  /* bouton visible seulement en mobile */
+  #toggleSettings { display: inline-block; }
+}
+
+#toggleSettings {
+  background: rgba(0,0,0,.35);
+  margin-right: 5px;
 }
